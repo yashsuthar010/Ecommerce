@@ -6,6 +6,7 @@ import {
   ProductsContainer,
   CategoryButton,
   Container,
+  CategoryAndFilter,
 } from "./Products.styled";
 
 const Products = () => {
@@ -62,17 +63,19 @@ const Products = () => {
   return (
     <Container>
       <h1 style={{ fontWeight: 500 }}>Products</h1>
-      <div>
-        {getUniqueCategories().map((cat) => (
-          <CategoryButton
-            key={cat}
-            onClick={() => handleCategorySelect(cat)}
-            active={cat === selectedCategory}
-          >
-            {cat}
-          </CategoryButton>
-        ))}
-      </div>
+      <CategoryAndFilter>
+        <div>
+          {getUniqueCategories().map((cat) => (
+            <CategoryButton
+              key={cat}
+              onClick={() => handleCategorySelect(cat)}
+              active={cat === selectedCategory}
+            >
+              {cat}
+            </CategoryButton>
+          ))}
+        </div>
+      </CategoryAndFilter>
       <ProductsContainer>
         {filteredProducts.map((product) => (
           <Product {...product} key={product.id} />
