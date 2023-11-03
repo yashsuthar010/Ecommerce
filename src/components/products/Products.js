@@ -11,28 +11,23 @@ import {
 
 const Products = () => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
   const productsPerPage = 12;
-  const lastIndex = currentPage * productsPerPage;
-  const firstIndex = lastIndex - productsPerPage;
 
   useEffect(() => {
     axios
       .get("https://dummyjson.com/products")
       .then((res) => {
         setProducts(res.data.products);
-        setLoading(false);
       })
       .catch(() => {
         alert("Error");
       });
   }, []);
-
-  const slicedProducts = products.slice(firstIndex, lastIndex);
-  const nPage = Math.ceil(products.length / productsPerPage);
 
   const getUniqueCategories = () => {
     const categories = [
@@ -42,23 +37,43 @@ const Products = () => {
     return categories;
   };
 
-  const PriceFilter = () => {
-    const Prices = [...new Set(products.map((p) => p.price))];
-    console.log(Prices.sort());
-    return Prices;
+  const PriceFilter = (data) => {
+    return [...data].sort((a, b) => {
+      if (sortOrder === "asc") {
+        return a.price - b.price;
+      } else if (sortOrder === "desc") {
+        return b.price - a.price;
+      }
+    });
   };
-
-  PriceFilter();
 
   const handleCategorySelect = (category) => {
     setSelectedCategory(category);
     setCurrentPage(1);
   };
 
-  const filteredProducts =
-    selectedCategory === "All"
-      ? slicedProducts
-      : products.filter((product) => product.category === selectedCategory);
+  useEffect(() => {
+    let filteredData = products;
+
+    if (selectedCategory !== "All") {
+      filteredData = products.filter(
+        (product) => product.category === selectedCategory
+      );
+    }
+
+    const sortedData = PriceFilter(filteredData);
+    setFilteredProducts(sortedData);
+  }, [selectedCategory, sortOrder, products]);
+
+  const nPage = Math.ceil(filteredProducts.length / productsPerPage);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const handleSortOrderChange = (e) => {
+    setSortOrder(e.target.value);
+  };
 
   return (
     <Container>
@@ -75,16 +90,27 @@ const Products = () => {
             </CategoryButton>
           ))}
         </div>
+        <div>
+          <select value={sortOrder} onChange={handleSortOrderChange}>
+            <option value="asc">Low to High</option>
+            <option value="desc">High to Low</option>
+          </select>
+        </div>
       </CategoryAndFilter>
       <ProductsContainer>
-        {filteredProducts.map((product) => (
-          <Product {...product} key={product.id} />
-        ))}
+        {filteredProducts
+          .slice(
+            (currentPage - 1) * productsPerPage,
+            currentPage * productsPerPage
+          )
+          .map((product) => (
+            <Product {...product} key={product.id} />
+          ))}
       </ProductsContainer>
       <Pagination
         nPage={nPage}
         currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
+        setCurrentPage={handlePageChange}
       />
     </Container>
   );

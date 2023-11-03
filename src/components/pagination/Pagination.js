@@ -28,10 +28,10 @@ const Pagination = ({ nPage, currentPage, setCurrentPage }) => {
           {numbers.map((pgNumber) => (
             <PaginationItem
               key={pgNumber}
-              active={currentPage == pgNumber}
+              active={currentPage === pgNumber}
               onClick={() => setCurrentPage(pgNumber)}
             >
-              <Anchor href="#" active={currentPage == pgNumber}>
+              <Anchor href="#" active={currentPage === pgNumber}>
                 {pgNumber}
               </Anchor>
             </PaginationItem>

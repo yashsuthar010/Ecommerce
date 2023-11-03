@@ -38,4 +38,10 @@ export const CategoryButton = styled.button`
 export const CategoryAndFilter = styled.div`
   display: flex;
   justify-content: space-between;
+  select {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+  }
 `;
